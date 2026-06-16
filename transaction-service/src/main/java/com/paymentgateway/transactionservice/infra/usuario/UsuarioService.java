@@ -4,24 +4,48 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
 @Service
 public class UsuarioService {
 
-    private final userRepository userRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public UsuarioService(userRepository userRepository) {
-        this.userRepository = userRepository;
+    public UsuarioService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
     }
 
     public List<Usuario> listarUsuarios() {
-        return userRepository.findAll();
+        return usuarioRepository.findAll();
     }
 
     public Usuario buscarUsuarioPorId(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        return usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
     public Usuario cadastrar(CadastroUsuarioDTO cadastroUsuarioDTO) {
+        if (usuarioRepository.findByEmail(cadastroUsuarioDTO.getEmail()) != null) {
+            throw new RuntimeException("Email já cadastrado");
+        }
 
+        Usuario usuario = new Usuario();
+        usuario.setUsername(cadastroUsuarioDTO.getUsername());
+        usuario.setEmail(cadastroUsuarioDTO.getEmail());
+        usuario.setPassword(cadastroUsuarioDTO.getPassword());
+
+        return usuarioRepository.save(usuario);
+    }
+
+    public Usuario atualizarUsuario(Long id, CadastroUsuarioDTO cadastroUsuarioDTO) {
+        Usuario usuario = buscarUsuarioPorId(id);
+        usuario.setUsername(cadastroUsuarioDTO.getUsername());
+        usuario.setEmail(cadastroUsuarioDTO.getEmail());
+        usuario.setPassword(cadastroUsuarioDTO.getPassword());
+        return usuarioRepository.save(usuario);
+    }
+
+    public Usuario deleteUsuario(Long id) {
+        Usuario usuario = buscarUsuarioPorId(id);
+        usuarioRepository.delete(usuario);
+        return usuario;
     }
 }
