@@ -22,6 +22,6 @@ public class UsuarioService {
     }
 
     public Usuario cadastrar(CadastroUsuarioDTO cadastroUsuarioDTO) {
-        
+
     }
 }
