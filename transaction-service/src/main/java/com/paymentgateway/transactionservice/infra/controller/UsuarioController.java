@@ -2,7 +2,6 @@ package com.paymentgateway.transactionservice.infra.controller;
 
 import com.paymentgateway.transactionservice.infra.usuario.CadastroUsuarioDTO;
 import com.paymentgateway.transactionservice.infra.usuario.Usuario;
-import com.paymentgateway.transactionservice.infra.usuario.UsuarioRepository;
 import com.paymentgateway.transactionservice.infra.usuario.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +45,7 @@ public class UsuarioController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
-        Usuario usuario = usuarioService.deleteUsuario(id);
+        usuarioService.deleteUsuario(id);
         return ResponseEntity.noContent().build();
     }
 
