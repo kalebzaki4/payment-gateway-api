@@ -1,5 +1,6 @@
 package com.paymentgateway.transactionservice.infra.usuario;
 
+import com.paymentgateway.transactionservice.infra.exception.EmailJaCadastradoException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class UsuarioService {
 
     public Usuario cadastrar(CadastroUsuarioDTO cadastroUsuarioDTO) {
         if (usuarioRepository.findByEmail(cadastroUsuarioDTO.getEmail()) != null) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new EmailJaCadastradoException("Email já cadastrado");
         }
 
         Usuario usuario = new Usuario();
