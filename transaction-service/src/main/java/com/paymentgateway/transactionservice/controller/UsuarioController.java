@@ -1,8 +1,8 @@
-package com.paymentgateway.transactionservice.infra.controller;
+package com.paymentgateway.transactionservice.controller;
 
-import com.paymentgateway.transactionservice.infra.usuario.CadastroUsuarioDTO;
-import com.paymentgateway.transactionservice.infra.usuario.Usuario;
-import com.paymentgateway.transactionservice.infra.usuario.UsuarioService;
+import com.paymentgateway.transactionservice.domain.usuario.CadastroUsuarioDTO;
+import com.paymentgateway.transactionservice.domain.usuario.Usuario;
+import com.paymentgateway.transactionservice.domain.usuario.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;

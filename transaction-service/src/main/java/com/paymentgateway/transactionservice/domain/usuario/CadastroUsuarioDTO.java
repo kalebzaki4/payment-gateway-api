@@ -1,4 +1,4 @@
-package com.paymentgateway.transactionservice.infra.usuario;
+package com.paymentgateway.transactionservice.domain.usuario;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

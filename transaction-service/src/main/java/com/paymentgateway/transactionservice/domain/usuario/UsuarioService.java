@@ -1,4 +1,4 @@
-package com.paymentgateway.transactionservice.infra.usuario;
+package com.paymentgateway.transactionservice.domain.usuario;
 
 import com.paymentgateway.transactionservice.infra.exception.EmailJaCadastradoException;
 import org.springframework.stereotype.Service;
