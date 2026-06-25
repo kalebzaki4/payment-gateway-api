@@ -2,32 +2,35 @@ package com.paymentgateway.transactionservice.infra.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
 import com.paymentgateway.transactionservice.domain.usuario.Usuario;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 @Service
 public class TokenService {
-
-    private final String secret = "secret-123456";
+    private String secretKey = "mySecretKey";
 
     public String generateToken(Usuario usuario) {
-        try {
-            var algorithm = Algorithm.HMAC256(secret);
-            return JWT.create().withIssuer("Payment Gateway").withSubject(usuario.getEmail())
-                    .withClaim("id", usuario.getId())
-                    .withExpiresAt(calculateExpirationDate())
-                    .sign(algorithm);
-        } catch (JWTCreationException exception) {
-            throw new RuntimeException("Erro ao gerar token JWT", exception);
-        }
+        var algorithm = Algorithm.HMAC256(secretKey);
+        return JWT.create()
+                .withIssuer("payment-gateway")
+                .withSubject(usuario.getEmail())
+                .withClaim("id", usuario.getId())
+                .withExpiresAt(expirationDate())
+                .sign(algorithm);
     }
 
-    private Instant calculateExpirationDate() {
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+    public String getSubject(String token) {
+        var algorithm = Algorithm.HMAC256(secretKey);
+        return JWT.require(algorithm)
+                .withIssuer("payment-gateway")
+                .build()
+                .verify(token)
+                .getSubject();
+    }
+
+    private Instant expirationDate() {
+        return Instant.now().plusSeconds(3600);
     }
 }
