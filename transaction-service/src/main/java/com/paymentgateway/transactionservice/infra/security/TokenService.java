@@ -2,35 +2,42 @@ package com.paymentgateway.transactionservice.infra.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
 import com.paymentgateway.transactionservice.domain.usuario.Usuario;
+import com.paymentgateway.transactionservice.infra.exception.TokenJWTNaoGeradoException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
 @Service
 public class TokenService {
-    private String secretKey = "mySecretKey";
+    private String tokenSecret = "eyJhbGciOi";
 
     public String generateToken(Usuario usuario) {
-        var algorithm = Algorithm.HMAC256(secretKey);
-        return JWT.create()
-                .withIssuer("payment-gateway")
-                .withSubject(usuario.getEmail())
-                .withClaim("id", usuario.getId())
-                .withExpiresAt(expirationDate())
-                .sign(algorithm);
+        try {
+            var algorithm = Algorithm.HMAC256(tokenSecret);
+            return JWT.create()
+                    .withIssuer("API Payment Gateway")
+                    .withExpiresAt(getExpirationDate())
+                    .withSubject(usuario.getEmail())
+                    .withClaim("id", usuario.getId())
+                    .sign(algorithm);
+        } catch (JWTCreationException exception) {
+            throw new TokenJWTNaoGeradoException("Erro ao gerar token", exception);
+        }
     }
 
-    public String getSubject(String token) {
-        var algorithm = Algorithm.HMAC256(secretKey);
+    public String getSubject(String tokenJWT) {
+        var algorithm = Algorithm.HMAC256(tokenSecret);
         return JWT.require(algorithm)
-                .withIssuer("payment-gateway")
+                .withIssuer("API Payment Gateway")
                 .build()
-                .verify(token)
+                .verify(tokenJWT)
                 .getSubject();
     }
 
-    private Instant expirationDate() {
+    private Instant getExpirationDate() {
         return Instant.now().plusSeconds(3600);
     }
+
 }

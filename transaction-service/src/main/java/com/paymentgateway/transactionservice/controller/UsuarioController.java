@@ -3,6 +3,9 @@ package com.paymentgateway.transactionservice.controller;
 import com.paymentgateway.transactionservice.domain.usuario.CadastroUsuarioDTO;
 import com.paymentgateway.transactionservice.domain.usuario.Usuario;
 import com.paymentgateway.transactionservice.domain.usuario.UsuarioService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,6 +18,7 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
+    @Autowired
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
@@ -38,7 +42,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> atualizarUsuario(@PathVariable Long id, @RequestBody CadastroUsuarioDTO cadastroUsuarioDTO) {
+    public ResponseEntity<Usuario> atualizarUsuario(@PathVariable Long id, @RequestBody @Valid CadastroUsuarioDTO cadastroUsuarioDTO) {
         Usuario usuarioExistente = usuarioService.atualizarUsuario(id, cadastroUsuarioDTO);
         return ResponseEntity.ok().body(usuarioExistente);
     }

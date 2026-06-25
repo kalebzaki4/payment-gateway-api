@@ -12,12 +12,17 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
     @ExceptionHandler(EmailJaCadastradoException.class)
     public String handleEmailJaCadastradoException(EmailJaCadastradoException ex) {
-        return ex.getMessage();
+        return buildResponse(ex.getMessage(), HttpStatus.CONFLICT).getBody().getMensagem();
     }
 
     @ExceptionHandler(UsuarioNaoEncontradoException.class)
     public String handleUsuarioNaoEncontradoException(UsuarioNaoEncontradoException ex) {
-        return ex.getMessage();
+        return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND).getBody().getMensagem();
+    }
+
+    @ExceptionHandler(TokenJWTNaoGeradoException.class)
+    public ResponseEntity<ErroResponse> handleTokenJWTNaoGeradoException(TokenJWTNaoGeradoException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<ErroResponse> buildResponse(String message, HttpStatus status) {
