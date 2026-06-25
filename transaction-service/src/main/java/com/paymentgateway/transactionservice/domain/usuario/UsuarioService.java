@@ -1,6 +1,8 @@
 package com.paymentgateway.transactionservice.domain.usuario;
 
 import com.paymentgateway.transactionservice.infra.exception.EmailJaCadastradoException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +13,12 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<Usuario> listarUsuarios() {
@@ -31,7 +37,7 @@ public class UsuarioService {
         Usuario usuario = new Usuario();
         usuario.setUsername(cadastroUsuarioDTO.getUsername());
         usuario.setEmail(cadastroUsuarioDTO.getEmail());
-        usuario.setPassword(cadastroUsuarioDTO.getPassword());
+        usuario.setPassword(passwordEncoder.encode(cadastroUsuarioDTO.getPassword()));
 
         return usuarioRepository.save(usuario);
     }
@@ -40,7 +46,7 @@ public class UsuarioService {
         Usuario usuario = buscarUsuarioPorId(id);
         usuario.setUsername(cadastroUsuarioDTO.getUsername());
         usuario.setEmail(cadastroUsuarioDTO.getEmail());
-        usuario.setPassword(cadastroUsuarioDTO.getPassword());
+        usuario.setPassword(passwordEncoder.encode(cadastroUsuarioDTO.getPassword()));
         return usuarioRepository.save(usuario);
     }
 
