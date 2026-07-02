@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -14,16 +15,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "conta")
-public class Conta {
+public class Conta implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToMany(mappedBy = "contaOrigem")
-    private List<Transferencia> transferenciasEnviadas;
+    private transient List<Transferencia> transferenciasEnviadas;
 
     @OneToMany(mappedBy = "contaDestino")
-    private List<Transferencia> transferenciasRecebidas;
+    private transient List<Transferencia> transferenciasRecebidas;
 
     @Column(nullable = false)
     private BigDecimal valor;
