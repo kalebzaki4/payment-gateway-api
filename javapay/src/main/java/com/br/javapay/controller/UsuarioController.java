@@ -20,13 +20,13 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    @GetMapping(produces = "application/json")
+    @GetMapping
     public ResponseEntity<List<Usuario>> getAllUsuarios() {
         List<Usuario> usuarios = usuarioService.findAll();
         return ResponseEntity.ok(usuarios);
     }
 
-    @GetMapping(value = "/{id}", produces = "application/json")
+    @GetMapping(value = "/{id}")
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable long id) {
         Usuario usuario = usuarioService.findById(id);
         return ResponseEntity.ok(usuario);
