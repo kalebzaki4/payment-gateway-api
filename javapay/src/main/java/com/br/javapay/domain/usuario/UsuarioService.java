@@ -1,8 +1,8 @@
 package com.br.javapay.domain.usuario;
 
+import com.br.javapay.infra.exception.UsuarioNaoEncontradoException;
 import com.br.javapay.domain.conta.Conta;
 import com.br.javapay.domain.conta.Status;
-import com.br.javapay.infra.exception.UsuarioNaoEncontradoException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,50 +15,55 @@ import java.util.List;
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
 
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder encoder;
 
     @Autowired
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder encoder) {
         this.usuarioRepository = usuarioRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.encoder = encoder;
     }
 
-    // ver todos os usuários
+    // procurar usuario por ID
+    public Usuario findById(long id) {
+        return usuarioRepository.findById(id).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+    }
+
+    // procurar todos os usuarios
     public List<Usuario> findAll() {
         return usuarioRepository.findAll();
     }
 
-    // ver um usuário específico
-    public Usuario findById(Long id) {
-        if (usuarioRepository.findById(id).isPresent()) {
-            return usuarioRepository.findById(id).get();
-        }
-        throw new UsuarioNaoEncontradoException("Usuário não encontrado com o ID: " + id);
-    }
-
-    // criar usuário
+    // criar usuario
     public Usuario createUsuario(UsuarioRequestDTO usuarioRequestDTO) {
         Usuario usuario = new Usuario();
         BeanUtils.copyProperties(usuarioRequestDTO, usuario);
-        usuario.setPassword(passwordEncoder.encode(usuarioRequestDTO.password()));
+        usuario.setSenha(encoder.encode(usuario.getSenha()));
         usuario.setRole(Roles.USER);
         Conta conta = new Conta();
-        conta.setValor(BigDecimal.ZERO);
-        conta.setStatusConta(Status.ATIVO);
+        conta.setSaldo(BigDecimal.ZERO);
+        conta.setStatus(Status.ATIVO);
         usuario.setConta(conta);
         return usuarioRepository.save(usuario);
     }
 
-    // atualizar usuário
-    public Usuario updateUsuario(Long id, UsuarioRequestDTO usuarioRequestDTO) {
-        Usuario usuarioExistente = findById(id);
+    // atualizar usuario
+    public Usuario updateUsuario(long id, UsuarioRequestDTO usuarioRequestDTO) {
+        Usuario usuario = findById(id);
         if (usuarioRequestDTO.email() != null && !usuarioRequestDTO.email().isBlank()) {
-            usuarioExistente.setEmail(usuarioRequestDTO.email());
+            usuario.setEmail(usuarioRequestDTO.email());
         }
-        if (usuarioRequestDTO.password() != null && !usuarioRequestDTO.password().isBlank()) {
-            usuarioExistente.setPassword(passwordEncoder.encode(usuarioRequestDTO.password()));
+        if (usuarioRequestDTO.senha() != null && !usuarioRequestDTO.senha().isBlank()) {
+            usuario.setSenha(encoder.encode(usuarioRequestDTO.senha()));
         }
-        return usuarioRepository.save(usuarioExistente);
+        return usuarioRepository.save(usuario);
     }
 
+    // deletar usuário
+    public void deleteUsuario(long id) {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        usuario.getConta().setStatus(Status.INATIVO);
+
+        usuarioRepository.save(usuario);
+    }
 }

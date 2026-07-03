@@ -3,8 +3,10 @@ package com.br.javapay.controller;
 import com.br.javapay.domain.usuario.Usuario;
 import com.br.javapay.domain.usuario.UsuarioRequestDTO;
 import com.br.javapay.domain.usuario.UsuarioService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -13,38 +15,39 @@ import java.util.List;
 public class UsuarioController {
     private final UsuarioService usuarioService;
 
+    @Autowired
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
-    // ver todos os usuários
-    @GetMapping
-    public ResponseEntity<List<Usuario>> findAll() {
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<List<Usuario>> getAllUsuarios() {
         List<Usuario> usuarios = usuarioService.findAll();
         return ResponseEntity.ok(usuarios);
     }
 
-    // ver um usuário expecífico
-    @GetMapping("/{id}")
-    public ResponseEntity<Usuario> findById(@PathVariable Long id) {
-        Usuario usuarioEncontrado = usuarioService.findById(id);
-        return ResponseEntity.ok(usuarioEncontrado);
+    @GetMapping(value = "/{id}", produces = "application/json")
+    public ResponseEntity<Usuario> getUsuarioById(@PathVariable long id) {
+        Usuario usuario = usuarioService.findById(id);
+        return ResponseEntity.ok(usuario);
     }
 
-    // criar usuário
     @PostMapping
-    public ResponseEntity<Usuario> createUsuario(@RequestBody UsuarioRequestDTO usuarioRequestDTO) {
-        Usuario usuarioCriado = usuarioService.createUsuario(usuarioRequestDTO);
-        return ResponseEntity.ok(usuarioCriado);
+    public ResponseEntity<Usuario> createUsuario(@RequestBody UsuarioRequestDTO usuarioRequestDTO, UriComponentsBuilder uriComponentsBuilder) {
+        Usuario usuario = usuarioService.createUsuario(usuarioRequestDTO);
+        var uri = uriComponentsBuilder.path("/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
+        return ResponseEntity.created(uri).body(usuario);
     }
 
-    // atualizar usuário
-    @PutMapping("/{id}")
-    public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody UsuarioRequestDTO usuarioRequestDTO) {
-        Usuario usuarioAtualizado = usuarioService.updateUsuario(id, usuarioRequestDTO);
-        return ResponseEntity.ok(usuarioAtualizado);
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Usuario> updateUsuario(@PathVariable long id, @RequestBody UsuarioRequestDTO usuarioRequestDTO) {
+        Usuario usuario = usuarioService.updateUsuario(id, usuarioRequestDTO);
+        return ResponseEntity.ok(usuario);
     }
 
-
-
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteUsuario(@PathVariable long id) {
+        usuarioService.deleteUsuario(id);
+        return ResponseEntity.noContent().build();
+    }
 }

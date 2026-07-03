@@ -1,180 +1,293 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaPay - Início</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { primary: { DEFAULT: '#820AD1' } },
-                    boxShadow: { soft: '0 10px 60px -20px rgba(0,0,0,0.4)' }
-                }
-            }
-        }
-    </script>
-    
-    <style>
-        body { background-color: #020617; }
-        .input-focus:focus { 
-            outline: none; 
-            border-color: rgba(130,10,209,0.4);
-            box-shadow: 0 0 0 4px rgba(130,10,209,0.1);
-        }
-    </style>
+    <title>Dashboard - JavaPay</title>
+    <link rel="stylesheet" href="/css/design-system.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
 </head>
-<body class="min-h-screen">
-    
+<body>
     <!-- Navbar -->
-    <nav class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-2xl border-b border-white/5">
-        <div class="max-w-5xl mx-auto px-8 py-6">
-            <div class="flex items-center justify-between">
-                <a th:href="@{/dashboard}" class="flex items-center gap-4">
-                    <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-white/5 border border-white/10">
-                        <i class="ph ph-wallet text-2xl text-white"></i>
-                    </div>
-                    <span class="text-xl font-semibold text-white">JavaPay</span>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <a href="/app/dashboard" class="brand-logo">
+                    <span class="brand-icon">💳</span>
+                    <span class="brand-text">JavaPay</span>
                 </a>
-                
-                <div class="flex items-center gap-5">
-                    <button class="p-3 rounded-2xl hover:bg-white/5 transition-colors">
-                        <i class="ph ph-bell text-2xl text-zinc-400"></i>
+            </div>
+
+            <div class="navbar-content">
+                <div class="navbar-search">
+                    <input
+                        type="text"
+                        class="search-input"
+                        placeholder="Buscar transações..."
+                        id="globalSearch"
+                    >
+                </div>
+
+                <div class="navbar-actions">
+                    <button class="icon-button" id="notificationsBtn" aria-label="Notificações">
+                        <span class="icon">🔔</span>
+                        <span class="badge-dot"></span>
                     </button>
-                    <div class="flex items-center gap-4">
-                        <div class="hidden md:block text-right">
-                            <p class="text-sm font-semibold text-white" th:text="${usuario.nome}">Usuário</p>
-                            <p class="text-xs text-zinc-500">Premium</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">
-                            <i class="ph ph-user text-xl text-zinc-300"></i>
-                        </div>
-                        <form th:action="@{/logout}" method="post">
-                            <button type="submit" class="p-3 rounded-2xl hover:bg-white/5 text-zinc-400 hover:text-red-400 transition-colors">
-                                <i class="ph ph-sign-out text-xl"></i>
+
+                    <button class="icon-button" id="settingsBtn" aria-label="Configurações">
+                        <span class="icon">⚙️</span>
+                    </button>
+
+                    <div class="navbar-divider"></div>
+
+                    <div class="navbar-profile">
+                        <button class="profile-button" id="profileBtn" aria-label="Perfil">
+                            <div class="avatar" id="userAvatar">K</div>
+                            <span class="profile-name" id="userName">Usuário</span>
+                        </button>
+
+                        <div class="dropdown-menu" id="profileMenu">
+                            <a href="/app/profile" class="dropdown-item">
+                                <span>👤 Meu Perfil</span>
+                            </a>
+                            <a href="/app/settings" class="dropdown-item">
+                                <span>⚙️ Configurações</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item logout-btn" id="logoutBtn">
+                                <span>🚪 Sair</span>
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
-    
-    <!-- Main -->
-    <main class="max-w-5xl mx-auto px-8 py-12">
-        
-        <!-- Balance Section -->
-        <div class="mb-16">
-            <p class="text-sm font-medium text-zinc-400 mb-3">Saldo disponível</p>
-            <h1 class="text-5xl font-semibold text-white mb-8" th:text="'R$ ' + ${usuario.saldo}">R$ 12.548,75</h1>
-            <a th:href="@{/transferencia}" class="inline-flex items-center gap-2 px-6 py-4 bg-primary text-white rounded-2xl font-semibold transition-all duration-200 hover:bg-primary/90 hover:scale-[1.005]">
-                <i class="ph ph-paper-plane-tilt text-xl"></i>
-                Nova transferência
-            </a>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <a href="/app/dashboard" class="nav-item active">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Operações</div>
+                    <a href="/app/usuarios" class="nav-item">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-label">Usuários</span>
+                    </a>
+                    <a href="/app/contas" class="nav-item">
+                        <span class="nav-icon">💰</span>
+                        <span class="nav-label">Contas</span>
+                    </a>
+                    <a href="/app/transferencias" class="nav-item">
+                        <span class="nav-icon">💸</span>
+                        <span class="nav-label">Transferências</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Relatórios</div>
+                    <a href="/app/relatorios/transacoes" class="nav-item">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Transações</span>
+                    </a>
+                    <a href="/app/relatorios/usuarios" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Usuários</span>
+                    </a>
+                </div>
+            </nav>
         </div>
-        
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-7 transition-all duration-200 hover:bg-white/6">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                        <i class="ph ph-trend-up text-2xl text-zinc-300"></i>
-                    </div>
-                </div>
-                <p class="text-xs font-medium text-zinc-500 mb-2">Receitas</p>
-                <p class="text-xl font-semibold text-white">R$ 8.420,00</p>
-            </div>
-            
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-7 transition-all duration-200 hover:bg-white/6">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                        <i class="ph ph-trend-down text-2xl text-zinc-300"></i>
-                    </div>
-                </div>
-                <p class="text-xs font-medium text-zinc-500 mb-2">Despesas</p>
-                <p class="text-xl font-semibold text-white">R$ 3.150,50</p>
-            </div>
-            
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-7 transition-all duration-200 hover:bg-white/6">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                        <i class="ph ph-arrows-left-right text-2xl text-zinc-300"></i>
-                    </div>
-                </div>
-                <p class="text-xs font-medium text-zinc-500 mb-2">Volume</p>
-                <p class="text-xl font-semibold text-white">124 transações</p>
-            </div>
-            
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-7 transition-all duration-200 hover:bg-white/6">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                        <i class="ph ph-users text-2xl text-zinc-300"></i>
-                    </div>
-                </div>
-                <p class="text-xs font-medium text-zinc-500 mb-2">Contatos</p>
-                <p class="text-xl font-semibold text-white">48 pessoas</p>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-version">
+                <span class="version-text">v1.0.0</span>
             </div>
         </div>
-        
-        <!-- History -->
-        <div>
-            <h2 class="text-lg font-semibold text-white mb-6">Histórico</h2>
-            <div class="space-y-4">
-                <!-- Thymeleaf Items -->
-                <div th:each="t : ${transferencias}" class="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center justify-between transition-all duration-200 hover:bg-white/6">
-                    <div class="flex items-center gap-5">
-                        <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">
-                            <i class="ph ph-arrow-up-right text-2xl text-zinc-400"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-white" th:text="${t.destinatario}">João Pereira</p>
-                            <p class="text-xs text-zinc-500" th:text="${#temporals.format(t.data, 'dd/MM/yyyy HH:mm')}">02/07 14:32</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-semibold text-white" th:text="'R$ ' + ${t.valor}">R$ 250,00</p>
-                    </div>
-                </div>
-                
-                <!-- Sample Items -->
-                <div class="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center justify-between transition-all duration-200 hover:bg-white/6">
-                    <div class="flex items-center gap-5">
-                        <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">
-                            <i class="ph ph-arrow-down-left text-2xl text-zinc-400"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-white">Maria Silva</p>
-                            <p class="text-xs text-zinc-500">01/07 09:15</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-semibold text-white">+R$ 500,00</p>
-                    </div>
-                </div>
-                
-                <div class="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center justify-between transition-all duration-200 hover:bg-white/6">
-                    <div class="flex items-center gap-5">
-                        <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">
-                            <i class="ph ph-arrow-up-right text-2xl text-zinc-400"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-white">Netflix</p>
-                            <p class="text-xs text-zinc-500">30/06 18:45</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-semibold text-zinc-300">-R$ 39,90</p>
-                    </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-header">
+            <div class="content-header-title">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p class="text-muted" style="margin-top: 0.5rem;">Bem-vindo ao JavaPay</p>
                 </div>
             </div>
         </div>
-        
+
+        <div class="content-area">
+            <!-- Metrics Row -->
+            <div class="grid grid-4">
+                <div class="metric-card animate-fade-in" style="animation-delay: 0.05s">
+                    <div class="metric-header">
+                        <span class="metric-icon">💸</span>
+                        <span class="metric-label">Volume Total</span>
+                    </div>
+                    <div class="metric-value" id="volumeTotal">R$ 0,00</div>
+                    <div class="metric-change positive">
+                        <span class="change-icon">↗</span>
+                        <span class="change-text" id="volumeChange">+12% vs mês anterior</span>
+                    </div>
+                </div>
+
+                <div class="metric-card animate-fade-in" style="animation-delay: 0.1s">
+                    <div class="metric-header">
+                        <span class="metric-icon">📊</span>
+                        <span class="metric-label">Transações</span>
+                    </div>
+                    <div class="metric-value" id="transactionCount">0</div>
+                    <div class="metric-change positive">
+                        <span class="change-icon">↗</span>
+                        <span class="change-text">+5% vs mês anterior</span>
+                    </div>
+                </div>
+
+                <div class="metric-card animate-fade-in" style="animation-delay: 0.15s">
+                    <div class="metric-header">
+                        <span class="metric-icon">👥</span>
+                        <span class="metric-label">Usuários Ativos</span>
+                    </div>
+                    <div class="metric-value" id="activeUsers">0</div>
+                    <div class="metric-change positive">
+                        <span class="change-icon">↗</span>
+                        <span class="change-text">+8% vs mês anterior</span>
+                    </div>
+                </div>
+
+                <div class="metric-card animate-fade-in" style="animation-delay: 0.2s">
+                    <div class="metric-header">
+                        <span class="metric-icon">✅</span>
+                        <span class="metric-label">Taxa de Sucesso</span>
+                    </div>
+                    <div class="metric-value" id="successRate">99%</div>
+                    <div class="metric-change positive">
+                        <span class="change-icon">↗</span>
+                        <span class="change-text">+0.5% vs mês anterior</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-2 mt-2xl">
+                <div class="card animate-fade-in" style="animation-delay: 0.25s">
+                    <div class="card-header">
+                        <h3>Transferências por Dia</h3>
+                        <select class="period-select" id="chartPeriod">
+                            <option value="7d">Últimos 7 dias</option>
+                            <option value="30d">Últimos 30 dias</option>
+                            <option value="90d">Últimos 90 dias</option>
+                        </select>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-placeholder" id="chartTransfers">
+                            <div style="text-align: center; padding: 2rem; color: var(--color-gray-400);">
+                                📊 Gráfico de transferências
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card animate-fade-in" style="animation-delay: 0.3s">
+                    <div class="card-header">
+                        <h3>Status de Contas</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="account-status">
+                            <div class="status-item">
+                                <div class="status-badge status-ativo"></div>
+                                <div class="status-info">
+                                    <div class="status-label">Ativas</div>
+                                    <div class="status-count" id="countActive">0</div>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-badge status-pendente"></div>
+                                <div class="status-info">
+                                    <div class="status-label">Pendentes</div>
+                                    <div class="status-count" id="countPending">0</div>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-badge status-inativo"></div>
+                                <div class="status-info">
+                                    <div class="status-label">Inativas</div>
+                                    <div class="status-count" id="countInactive">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card mt-2xl animate-fade-in" style="animation-delay: 0.35s">
+                <div class="card-header">
+                    <h3>Atividade Recente</h3>
+                    <a href="/app/transferencias" class="text-sm text-muted" style="text-decoration: none; color: var(--color-purple-600);">
+                        Ver tudo →
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="activity-list" id="activityList">
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <div class="empty-title">Nenhuma atividade</div>
+                            <div class="empty-description">Comece criando uma transferência</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions mt-2xl animate-fade-in" style="animation-delay: 0.4s">
+                <div class="quick-action-card">
+                    <div class="quick-action-icon">➕</div>
+                    <div class="quick-action-content">
+                        <div class="quick-action-title">Criar Usuário</div>
+                        <div class="quick-action-description">Adicione um novo usuário ao sistema</div>
+                    </div>
+                    <a href="/app/usuarios/criar" class="quick-action-link">→</a>
+                </div>
+
+                <div class="quick-action-card">
+                    <div class="quick-action-icon">💸</div>
+                    <div class="quick-action-content">
+                        <div class="quick-action-title">Nova Transferência</div>
+                        <div class="quick-action-description">Realize uma transferência entre contas</div>
+                    </div>
+                    <a href="/app/transferencias/criar" class="quick-action-link">→</a>
+                </div>
+
+                <div class="quick-action-card">
+                    <div class="quick-action-icon">📊</div>
+                    <div class="quick-action-content">
+                        <div class="quick-action-title">Ver Relatórios</div>
+                        <div class="quick-action-description">Analise dados e métricas do sistema</div>
+                    </div>
+                    <a href="/app/relatorios/transacoes" class="quick-action-link">→</a>
+                </div>
+            </div>
+        </div>
     </main>
+
+    <script src="/js/components.js"></script>
+    <script src="/js/layout.js"></script>
+    <script src="/js/pages/dashboard.js"></script>
 </body>
 </html>
+
+

@@ -1,6 +1,6 @@
 package com.br.javapay.domain.conta;
 
-import com.br.javapay.domain.transferencia.Transferencia;
+import com.br.javapay.domain.tranferencia.Tranferencia;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,25 +11,32 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Data
+@Table(name = "conta")
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "conta")
+@Data
 public class Conta implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "contaOrigem")
-    private transient List<Transferencia> transferenciasEnviadas;
-
-    @OneToMany(mappedBy = "contaDestino")
-    private transient List<Transferencia> transferenciasRecebidas;
-
-    @Column(nullable = false)
-    private BigDecimal valor;
+    private BigDecimal saldo;
 
     @Enumerated(EnumType.STRING)
-    private Status statusConta;
+    private Status status;
+
+    @OneToMany(mappedBy = "contaInicial")
+    private transient List<Tranferencia> transferencias;
+
+    @OneToMany(mappedBy = "contaFinal")
+    private transient List<Tranferencia> transferenciasRecebidas;
+
+    public void debitar(BigDecimal valor) {
+        this.saldo = this.saldo.subtract(valor);
+    }
+
+    public void creditar(BigDecimal valor) {
+        this.saldo = this.saldo.add(valor);
+    }
 
 }

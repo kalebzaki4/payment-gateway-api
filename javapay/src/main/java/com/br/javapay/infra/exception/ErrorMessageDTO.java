@@ -1,6 +1,6 @@
 package com.br.javapay.infra.exception;
 
-public record ErroResponseDTO(
+public record ErrorMessageDTO(
         String message,
-        String timestamp) {
+        String details) {
 }

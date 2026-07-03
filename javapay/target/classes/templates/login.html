@@ -1,116 +1,287 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaPay - Entrar</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { primary: { DEFAULT: '#820AD1' } },
-                    boxShadow: { soft: '0 10px 60px -20px rgba(0,0,0,0.4)' }
-                }
-            }
-        }
-    </script>
-    
+    <title>JavaPay - Login</title>
+    <link rel="stylesheet" href="/css/design-system.css">
     <style>
-        body { background-color: #020617; }
-        .input-focus:focus { 
-            outline: none; 
-            border-color: rgba(130,10,209,0.4);
-            box-shadow: 0 0 0 4px rgba(130,10,209,0.1);
+        body {
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-lg);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            padding: var(--spacing-3xl);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: var(--spacing-3xl);
+        }
+
+        .login-logo {
+            font-size: 2.5rem;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-purple-600);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .login-title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--color-gray-900);
+        }
+
+        .login-subtitle {
+            margin-top: var(--spacing-sm);
+            color: var(--color-gray-500);
+            font-size: 0.875rem;
+        }
+
+        .login-form .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .login-form .form-group:last-of-type {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .login-divider {
+            text-align: center;
+            color: var(--color-gray-400);
+            font-size: 0.875rem;
+            margin: var(--spacing-xl) 0;
+        }
+
+        .login-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--spacing-md);
+            font-size: 0.875rem;
+        }
+
+        .login-links a {
+            color: var(--color-purple-600);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .login-links a:hover {
+            color: var(--color-purple-700);
+            text-decoration: underline;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--color-gray-200);
+            color: var(--color-gray-500);
+            font-size: 0.75rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-gray-400);
+            pointer-events: none;
+        }
+
+        .input-group input {
+            padding-left: 2.5rem;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-gray-400);
+            padding: 0;
+        }
+
+        .password-toggle:hover {
+            color: var(--color-gray-600);
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: var(--spacing-xl);
+            }
+
+            .login-header {
+                margin-bottom: var(--spacing-2xl);
+            }
+
+            .login-logo {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center px-8">
-    
-    <div class="w-full max-w-md">
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/5 border border-white/10 mb-8">
-                <i class="ph ph-wallet text-3xl text-white"></i>
+<body>
+    <div class="login-container">
+        <div class="login-card animate-fade-in">
+            <div class="login-header">
+                <div class="login-logo">💳</div>
+                <h1 class="login-title">JavaPay</h1>
+                <p class="login-subtitle">Gateway de Pagamento Seguro</p>
             </div>
-            <h1 class="text-2xl font-semibold text-white mb-2">JavaPay</h1>
-            <p class="text-zinc-400">Entre na sua conta</p>
-        </div>
-        
-        <!-- Card -->
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-9 shadow-soft">
-            
-            <!-- Google Button -->
-            <a href="/oauth2/authorization/google" 
-               class="flex items-center justify-center gap-3 w-full py-4 px-6 bg-white text-slate-900 rounded-xl font-medium transition-all duration-200 hover:bg-zinc-100 hover:scale-[1.005]">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z" fill="#4285F4"/>
-                    <path d="M12 24c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.595-4.123H1.064v2.59A11.99 11.99 0 0012 24z" fill="#34A853"/>
-                    <path d="M4.405 14.3c-.2-.6-.314-1.24-.314-2s.114-1.4.314-2V6.51H1.064A11.99 11.99 0 000 12c0 1.87.44 3.63 1.21 5.19l3.195-2.89z" fill="#FBBC05"/>
-                    <path d="M12 4.8c1.468 0 2.786.505 3.823 1.496l2.868-2.868C16.636 1.39 14.464 0 12 0 7.29 0 3.21 2.64 1.236 6.51l3.195 2.79C5.59 6.8 8.51 4.8 12 4.8z" fill="#EA4335"/>
-                </svg>
-                Entrar com Google
-            </a>
-            
-            <div class="flex items-center gap-4 my-8">
-                <div class="flex-1 h-px bg-white/10"></div>
-                <span class="text-xs font-medium text-zinc-500">ou</span>
-                <div class="flex-1 h-px bg-white/10"></div>
-            </div>
-            
-            <!-- Form -->
-            <form th:action="@{/login}" method="post" class="space-y-5">
-                <div class="space-y-2">
-                    <label class="text-sm font-medium text-zinc-300">Email</label>
-                    <div class="relative">
-                        <i class="ph ph-envelope-simple absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-                        <input type="email" name="email" required
-                               class="input-focus w-full pl-12 pr-5 py-4 bg-zinc-900/50 border border-white/10 rounded-xl text-white placeholder-zinc-600 text-base transition-all duration-200">
+
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-group">
+                        <span class="input-icon">✉</span>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="seu@email.com"
+                            required
+                        >
                     </div>
+                    <div class="form-error" id="emailError"></div>
                 </div>
-                
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label class="text-sm font-medium text-zinc-300">Senha</label>
-                        <a href="#" class="text-sm font-medium text-zinc-500 hover:text-white transition-colors">Esqueci</a>
-                    </div>
-                    <div class="relative">
-                        <i class="ph ph-lock-key absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-                        <input type="password" name="senha" id="senha" required
-                               class="input-focus w-full pl-12 pr-12 py-4 bg-zinc-900/50 border border-white/10 rounded-xl text-white placeholder-zinc-600 text-base transition-all duration-200">
-                        <button type="button" id="toggle" class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
-                            <i class="ph ph-eye text-lg"></i>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="input-group">
+                        <span class="input-icon">🔒</span>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Sua senha segura"
+                            required
+                        >
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            aria-label="Mostrar/Ocultar senha"
+                            id="passwordToggle"
+                        >
+                            👁
                         </button>
                     </div>
+                    <div class="form-error" id="passwordError"></div>
                 </div>
-                
-                <button type="submit" 
-                        class="w-full py-4 bg-primary text-white rounded-xl font-semibold transition-all duration-200 hover:bg-primary/90 hover:scale-[1.005]">
+
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
                     Entrar
                 </button>
+
+                <div class="login-links">
+                    <a href="/app/register">Criar conta</a>
+                    <a href="/app/forgot-password">Esqueceu a senha?</a>
+                </div>
             </form>
+
+            <div class="login-divider">OU</div>
+
+            <button class="btn btn-secondary btn-block">
+                Continuar com Google
+            </button>
+
+            <div class="login-footer">
+                Ao fazer login, você concorda com nossos <a href="#" style="color: var(--color-purple-600);">Termos de Serviço</a>
+            </div>
         </div>
     </div>
-    
+
+    <script src="/js/components.js"></script>
     <script>
-        document.getElementById('toggle').addEventListener('click', () => {
-            const input = document.getElementById('senha');
-            const icon = document.querySelector('#toggle i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('ph-eye');
-                icon.classList.add('ph-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('ph-eye-slash');
-                icon.classList.add('ph-eye');
+        const loginForm = document.getElementById('loginForm');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('password');
+
+        // Password toggle
+        passwordToggle.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            passwordToggle.textContent = type === 'password' ? '👁' : '🙈';
+        });
+
+        // Form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const validation = FormValidator.validate(loginForm, {
+                email: ['required', 'email'],
+                password: ['required', 'password']
+            });
+
+            if (!validation.isValid) {
+                Object.entries(validation.errors).forEach(([field, error]) => {
+                    document.getElementById(`${field}Error`).textContent = error;
+                });
+                return;
             }
+
+            const submitButton = loginForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Entrando...';
+
+            try {
+                const response = await APIClient.post('/api/auth/login', {
+                    email: loginForm.email.value,
+                    password: loginForm.password.value
+                });
+
+                // Mock: Simulating successful login
+                StorageHelper.setUser({ id: 1, email: loginForm.email.value });
+                StorageHelper.setToken('mock-jwt-token');
+
+                UIComponent.showToast('Login realizado com sucesso!', 'success');
+
+                setTimeout(() => {
+                    window.location.href = '/app/dashboard';
+                }, 1000);
+            } catch (error) {
+                UIComponent.showToast('Email ou senha incorretos', 'error');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Entrar';
+            }
+        });
+
+        // Clear error messages on input
+        ['email', 'password'].forEach(fieldName => {
+            document.getElementById(fieldName).addEventListener('input', () => {
+                document.getElementById(`${fieldName}Error`).textContent = '';
+            });
         });
     </script>
 </body>
 </html>
+
+

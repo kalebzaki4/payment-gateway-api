@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -27,32 +26,31 @@ public class Usuario implements UserDetails {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @NotBlank(message = "Email cannot be blank")
-    @Email(message = "Email should be valid")
+    private String cpf;
+
+    @Email
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @NotBlank
     @Column(nullable = false)
-    @NotBlank(message = "Password cannot be blank")
-    private String password;
+    private String senha;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Roles role;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "conta_id")
     private Conta conta;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.role == null) {
-            return List.of();
-        }
-        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+        return List.of(() -> "ROLE_" + this.role.name());
     }
-
-    @Enumerated(EnumType.STRING)
-    private Roles role;
 
     @Override
     public @Nullable String getPassword() {
-        return this.password;
+        return this.senha;
     }
 
     @Override
@@ -79,6 +77,4 @@ public class Usuario implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
-
-    private static final long serialVersionUID = 1L;
 }
