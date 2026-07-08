@@ -36,7 +36,7 @@ public class Usuario implements UserDetails {
     private String email;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(nullable = false, name = "password")
     private String senha;
 
     @Enumerated(EnumType.STRING)

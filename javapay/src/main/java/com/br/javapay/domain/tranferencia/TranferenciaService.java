@@ -50,7 +50,7 @@ public class TranferenciaService {
         if (destino.getStatus() == Status.INATIVO) {
             throw new RuntimeException("Conta de destino está inativa");
         }
-        if (origem.getSaldo().compareTo(valor) < 0) {
+        if (origem.getValor().compareTo(valor) < 0) {
             throw new RuntimeException("Saldo insuficiente na conta de origem");
         }
     }

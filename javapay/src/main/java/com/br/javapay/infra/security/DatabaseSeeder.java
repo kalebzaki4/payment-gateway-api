@@ -21,16 +21,14 @@ public class DatabaseSeeder implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Value("${security.password.encoder.secret}")
-    private String secretPassword;
-
     @Override
     public void run(String... args) {
         if (usuarioRepository.findByEmail("admin@javapay.com").isEmpty()) {
             Usuario admin = new Usuario();
+            admin.setCpf("00000000000");
             admin.setNome("Administrador Master");
             admin.setEmail("admin@javapay.com");
-            admin.setSenha(passwordEncoder.encode(secretPassword));
+            admin.setSenha(passwordEncoder.encode("admin123"));
             admin.setRole(Roles.ADMIN);
 
             usuarioRepository.save(admin);

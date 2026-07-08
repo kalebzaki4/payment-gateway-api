@@ -20,7 +20,7 @@ public class Conta implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private BigDecimal saldo;
+    private BigDecimal valor;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -32,11 +32,11 @@ public class Conta implements Serializable {
     private transient List<Tranferencia> transferenciasRecebidas;
 
     public void debitar(BigDecimal valor) {
-        this.saldo = this.saldo.subtract(valor);
+        this.valor = this.valor.subtract(valor);
     }
 
     public void creditar(BigDecimal valor) {
-        this.saldo = this.saldo.add(valor);
+        this.valor = this.valor.add(valor);
     }
 
 }

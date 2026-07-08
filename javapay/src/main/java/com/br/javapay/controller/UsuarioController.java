@@ -32,13 +32,6 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario);
     }
 
-    @PostMapping
-    public ResponseEntity<Usuario> createUsuario(@RequestBody UsuarioRequestDTO usuarioRequestDTO, UriComponentsBuilder uriComponentsBuilder) {
-        Usuario usuario = usuarioService.createUsuario(usuarioRequestDTO);
-        var uri = uriComponentsBuilder.path("/usuarios/{id}").buildAndExpand(usuario.getId()).toUri();
-        return ResponseEntity.created(uri).body(usuario);
-    }
-
     @PutMapping(value = "/{id}")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable long id, @RequestBody UsuarioRequestDTO usuarioRequestDTO) {
         Usuario usuario = usuarioService.updateUsuario(id, usuarioRequestDTO);
