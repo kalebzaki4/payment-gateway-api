@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class TranferenciaService {
@@ -21,8 +23,26 @@ public class TranferenciaService {
         this.contaRepository = contaRepository;
     }
 
+    public List<Transferencia> findAll() {
+        return transferenciaRepository.findAll();
+    }
+
+    // ver transferencias pela data que ela foi feita ou recebida
+    public List<Transferencia> findByData(Long contaId, TranferenciaDataDTO dataRequest) {
+        LocalDate diaDoFiltro = dataRequest.dataTransferencia().toLocalDate();
+
+        LocalDateTime dataInicio = diaDoFiltro.atStartOfDay(); // 00:00:00
+        LocalDateTime dataFim = diaDoFiltro.atTime(23, 59, 59); // 23:59:59
+
+        return transferenciaRepository.findByContaEData(
+                contaId,
+                dataInicio,
+                dataFim
+        );
+    }
+
     @Transactional
-    public Tranferencia realizarTransferencia(TransferenciaRequestDTO request) {
+    public Transferencia realizarTransferencia(TransferenciaRequestDTO request) {
         Conta contaOrigem = contaRepository.findById(request.contaInicial()).orElseThrow(() -> new RuntimeException("Conta de origem não encontrada"));
         Conta contaDestino = contaRepository.findById(request.contaFinal()).orElseThrow(() -> new RuntimeException("Conta de destino não encontrada"));
 
@@ -33,7 +53,7 @@ public class TranferenciaService {
         contaRepository.save(contaOrigem);
         contaRepository.save(contaDestino);
 
-        Tranferencia transferencia = new Tranferencia();
+        Transferencia transferencia = new Transferencia();
         transferencia.setContaInicial(contaOrigem);
         transferencia.setContaFinal(contaDestino);
         transferencia.setValor(request.saldo());

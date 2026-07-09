@@ -9,14 +9,13 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
 @Table(name = "transferencias")
-public class Tranferencia implements Serializable {
+public class Transferencia implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

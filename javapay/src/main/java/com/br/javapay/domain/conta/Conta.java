@@ -1,6 +1,6 @@
 package com.br.javapay.domain.conta;
 
-import com.br.javapay.domain.tranferencia.Tranferencia;
+import com.br.javapay.domain.tranferencia.Transferencia;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,10 +26,10 @@ public class Conta implements Serializable {
     private Status status;
 
     @OneToMany(mappedBy = "contaInicial")
-    private transient List<Tranferencia> transferencias;
+    private transient List<Transferencia> transferencias;
 
     @OneToMany(mappedBy = "contaFinal")
-    private transient List<Tranferencia> transferenciasRecebidas;
+    private transient List<Transferencia> transferenciasRecebidas;
 
     public void debitar(BigDecimal valor) {
         this.valor = this.valor.subtract(valor);
