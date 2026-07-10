@@ -9,11 +9,18 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.logging.Logger;
+
 @Component
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${security.password.encoder.secret}")
+    String senhaCriptografada;
+
+    Logger log = Logger.getLogger(DatabaseSeeder.class.getName());
 
     @Autowired
     public DatabaseSeeder(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
@@ -28,11 +35,11 @@ public class DatabaseSeeder implements CommandLineRunner {
             admin.setCpf("00000000000");
             admin.setNome("Administrador Master");
             admin.setEmail("admin@javapay.com");
-            admin.setSenha(passwordEncoder.encode("admin123"));
+            admin.setSenha(passwordEncoder.encode(senhaCriptografada));
             admin.setRole(Roles.ADMIN);
 
             usuarioRepository.save(admin);
-            System.out.println("🚀 [JavaPay] Primeiro Administrador criado com sucesso!");
+            log.info("[JavaPay] Primeiro Administrador criado com sucesso!\"");
         }
     }
 }

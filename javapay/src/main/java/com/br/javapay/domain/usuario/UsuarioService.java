@@ -1,5 +1,6 @@
 package com.br.javapay.domain.usuario;
 
+import com.br.javapay.infra.exception.CpfInvalidoException;
 import com.br.javapay.infra.exception.UsuarioNaoEncontradoException;
 import com.br.javapay.domain.conta.Conta;
 import com.br.javapay.domain.conta.Status;
@@ -31,9 +32,9 @@ public class UsuarioService {
     }
 
     public Usuario createUsuario(UsuarioRequestDTO usuarioRequestDTO) {
-        String cpfLimpo = usuarioRequestDTO.cpf().replaceAll("[^0-9]", "");
+        String cpfLimpo = usuarioRequestDTO.cpf().replaceAll("[\\D]", "");
         if (!validateCpf(cpfLimpo)) {
-            throw new RuntimeException("CPF inválido");
+            throw new CpfInvalidoException("CPF inválido");
         }
         Usuario usuario = new Usuario();
         BeanUtils.copyProperties(usuarioRequestDTO, usuario);
@@ -84,8 +85,6 @@ public class UsuarioService {
         }
         resto = 11 - (soma % 11);
         if (resto == 10 || resto == 11) resto = 0;
-        if (resto != Character.getNumericValue(cpf.charAt(10))) return false;
-
-        return true;
+        return (resto == Character.getNumericValue(cpf.charAt(10)));
     }
 }

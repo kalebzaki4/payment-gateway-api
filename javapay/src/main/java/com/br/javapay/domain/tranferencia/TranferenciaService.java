@@ -3,6 +3,10 @@ package com.br.javapay.domain.tranferencia;
 import com.br.javapay.domain.conta.Conta;
 import com.br.javapay.domain.conta.ContaRepository;
 import com.br.javapay.domain.conta.Status;
+import com.br.javapay.infra.exception.ContaDestinoInativaException;
+import com.br.javapay.infra.exception.ContaNaoEncontradaException;
+import com.br.javapay.infra.exception.ContaOrigemInativaException;
+import com.br.javapay.infra.exception.SaldoInsulficienteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -31,8 +36,8 @@ public class TranferenciaService {
     public List<Transferencia> findByData(Long contaId, TranferenciaDataDTO dataRequest) {
         LocalDate diaDoFiltro = dataRequest.dataTransferencia().toLocalDate();
 
-        LocalDateTime dataInicio = diaDoFiltro.atStartOfDay(); // 00:00:00
-        LocalDateTime dataFim = diaDoFiltro.atTime(23, 59, 59); // 23:59:59
+        LocalDateTime dataInicio = diaDoFiltro.atStartOfDay();
+        LocalDateTime dataFim = diaDoFiltro.atTime(23, 59, 59);
 
         return transferenciaRepository.findByContaEData(
                 contaId,
@@ -43,8 +48,8 @@ public class TranferenciaService {
 
     @Transactional
     public Transferencia realizarTransferencia(TransferenciaRequestDTO request) {
-        Conta contaOrigem = contaRepository.findById(request.contaInicial()).orElseThrow(() -> new RuntimeException("Conta de origem não encontrada"));
-        Conta contaDestino = contaRepository.findById(request.contaFinal()).orElseThrow(() -> new RuntimeException("Conta de destino não encontrada"));
+        Conta contaOrigem = contaRepository.findById(request.contaInicial()).orElseThrow(() -> new ContaNaoEncontradaException("Conta de origem não encontrada"));
+        Conta contaDestino = contaRepository.findById(request.contaFinal()).orElseThrow(() -> new ContaNaoEncontradaException("Conta de destino não encontrada"));
 
         validarTransferencia(contaOrigem, contaDestino, request.saldo());
         contaOrigem.debitar(request.saldo());
@@ -58,20 +63,20 @@ public class TranferenciaService {
         transferencia.setContaFinal(contaDestino);
         transferencia.setValor(request.saldo());
         transferencia.setStatus(StatusTransferencia.CONCLUIDA);
-        transferencia.setDataTransferencia(LocalDateTime.now());
+        transferencia.setDataTransferencia(LocalDateTime.now(ZoneId.systemDefault()));
 
         return transferenciaRepository.save(transferencia);
     }
 
     private void validarTransferencia(Conta origem, Conta destino, BigDecimal valor) {
         if (origem.getStatus() == Status.INATIVO) {
-            throw new RuntimeException("Conta de origem está inativa");
+            throw new ContaOrigemInativaException("Conta de origem está inativa");
         }
         if (destino.getStatus() == Status.INATIVO) {
-            throw new RuntimeException("Conta de destino está inativa");
+            throw new ContaDestinoInativaException("Conta de destino está inativa");
         }
         if (origem.getValor().compareTo(valor) < 0) {
-            throw new RuntimeException("Saldo insuficiente na conta de origem");
+            throw new SaldoInsulficienteException("Saldo insuficiente na conta de origem");
         }
     }
 }
