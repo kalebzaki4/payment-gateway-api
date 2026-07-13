@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,18 +33,24 @@ public class TranferenciaService {
         return transferenciaRepository.findAll();
     }
 
-    // ver transferencias pela data que ela foi feita ou recebida
-    public List<Transferencia> findByData(Long contaId, TranferenciaDataDTO dataRequest) {
-        LocalDate diaDoFiltro = dataRequest.dataTransferencia().toLocalDate();
+    public List<Transferencia> findByDataOrId(Long id, LocalDateTime dataRequest) {
+        List<Transferencia> extrato = new ArrayList<>();
 
-        LocalDateTime dataInicio = diaDoFiltro.atStartOfDay();
-        LocalDateTime dataFim = diaDoFiltro.atTime(23, 59, 59);
-
-        return transferenciaRepository.findByContaEData(
-                contaId,
-                dataInicio,
-                dataFim
-        );
+        if (id != null && dataRequest != null) {
+            throw new IllegalArgumentException("o ID ou a data não podem ser preenchidos juntos, é apenas um ou outro");
+        }
+        if (id == null && dataRequest == null) {
+            throw new IllegalArgumentException("os dados não podem ser nulos");
+        }
+        if (id == null && dataRequest != null) {
+            LocalDateTime dataInicio = dataRequest;
+            LocalDateTime dataFim = dataRequest.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+            extrato = transferenciaRepository.findByDataTransferenciaBetween(dataInicio, dataFim);
+        }
+        if (id != null && dataRequest == null) {
+            extrato = transferenciaRepository.findById(id).map(List::of).orElse(new ArrayList<>());
+        }
+        return extrato;
     }
 
     @Transactional

@@ -33,6 +33,6 @@ public class TokenService {
     }
 
     private Instant Expiration() {
-        return Instant.now().plusSeconds(2000);
+        return Instant.now().plusSeconds(60000);
     }
 }

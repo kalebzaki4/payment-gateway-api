@@ -4,10 +4,13 @@ import com.br.javapay.domain.tranferencia.TranferenciaDataDTO;
 import com.br.javapay.domain.tranferencia.TranferenciaService;
 import com.br.javapay.domain.tranferencia.TransferenciaRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.br.javapay.domain.tranferencia.Transferencia;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,10 +30,13 @@ public class TranferenciaController {
         return ResponseEntity.ok().body(transferencias);
     }
 
-    // ver transferencias pela data que ela foi feita ou recebida
-    @GetMapping(value = "/dataTransferencia/{id}")
-    public ResponseEntity<List<Transferencia>> getTranferenciasPorData(@PathVariable Long id, @RequestBody TranferenciaDataDTO transferenciaDataDTO) {
-        List<Transferencia> listaEncontrada = tranferenciaService.findByData(id, transferenciaDataDTO);
+    // ver transferencias pelo id ou data que ela foi feita ou recebida
+    @GetMapping(value = "/filtrarTranferencias")
+    public ResponseEntity<List<Transferencia>> getTranferenciasPorDataOuId(
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate dataTransferencia
+    ) {
+        List<Transferencia> listaEncontrada = tranferenciaService.findByDataOrId(id, dataTransferencia.atStartOfDay());
         return ResponseEntity.ok().body(listaEncontrada);
     }
 

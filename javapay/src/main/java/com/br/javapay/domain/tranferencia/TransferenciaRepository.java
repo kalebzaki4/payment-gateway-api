@@ -11,12 +11,7 @@ import java.util.List;
 @Repository
 public interface TransferenciaRepository extends JpaRepository<Transferencia, Long> {
 
-    @Query("SELECT t FROM Transferencia t WHERE " +
-            "(t.contaInicial.id = :contaId OR t.contaFinal.id = :contaId) " +
-            "AND t.dataTransferencia BETWEEN :dataInicio AND :dataFim")
-    List<Transferencia> findByContaEData(
-            @Param("contaId") Long contaId,
-            @Param("dataInicio") LocalDateTime dataInicio,
-            @Param("dataFim") LocalDateTime dataFim
-    );
+    List<Transferencia> findByDataTransferenciaBetween(LocalDateTime inicio, LocalDateTime fim);
+
+    List<Transferencia> findByid(Long id);
 }
