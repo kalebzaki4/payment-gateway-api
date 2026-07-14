@@ -3,9 +3,11 @@ package com.br.javapay.controller;
 import com.br.javapay.domain.tranferencia.TranferenciaDataDTO;
 import com.br.javapay.domain.tranferencia.TranferenciaService;
 import com.br.javapay.domain.tranferencia.TransferenciaRequestDTO;
+import com.br.javapay.domain.usuario.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.br.javapay.domain.tranferencia.Transferencia;
 
@@ -42,8 +44,8 @@ public class TranferenciaController {
 
     // realizar uma transferência
     @PostMapping(value = "/realizarTranferencia")
-    public ResponseEntity<Transferencia> createTransferencia(@RequestBody TransferenciaRequestDTO transferenciaRequestDTO) {
-        Transferencia transferencia = tranferenciaService.realizarTransferencia(transferenciaRequestDTO);
+    public ResponseEntity<Transferencia> createTransferencia(@RequestBody TransferenciaRequestDTO transferenciaRequestDTO, @AuthenticationPrincipal Usuario usuarioAutenticado) {
+        Transferencia transferencia = tranferenciaService.realizarTransferencia(transferenciaRequestDTO, usuarioAutenticado);
         return ResponseEntity.ok().body(transferencia);
     }
 

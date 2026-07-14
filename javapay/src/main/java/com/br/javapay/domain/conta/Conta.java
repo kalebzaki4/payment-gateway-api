@@ -1,6 +1,7 @@
 package com.br.javapay.domain.conta;
 
 import com.br.javapay.domain.tranferencia.Transferencia;
+import com.br.javapay.domain.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,9 @@ public class Conta implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne (mappedBy = "conta")
+    private Usuario usuario;
 
     private BigDecimal valor;
 

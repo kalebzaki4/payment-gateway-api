@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public record TransferenciaRequestDTO(
         Long contaInicial,
         Long contaFinal,
-        BigDecimal saldo) {
+        BigDecimal saldo,
+        String cpf) {
 
 }

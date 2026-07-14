@@ -3,10 +3,8 @@ package com.br.javapay.domain.tranferencia;
 import com.br.javapay.domain.conta.Conta;
 import com.br.javapay.domain.conta.ContaRepository;
 import com.br.javapay.domain.conta.Status;
-import com.br.javapay.infra.exception.ContaDestinoInativaException;
-import com.br.javapay.infra.exception.ContaNaoEncontradaException;
-import com.br.javapay.infra.exception.ContaOrigemInativaException;
-import com.br.javapay.infra.exception.SaldoInsulficienteException;
+import com.br.javapay.domain.usuario.Usuario;
+import com.br.javapay.infra.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,9 +52,23 @@ public class TranferenciaService {
     }
 
     @Transactional
-    public Transferencia realizarTransferencia(TransferenciaRequestDTO request) {
-        Conta contaOrigem = contaRepository.findById(request.contaInicial()).orElseThrow(() -> new ContaNaoEncontradaException("Conta de origem não encontrada"));
-        Conta contaDestino = contaRepository.findById(request.contaFinal()).orElseThrow(() -> new ContaNaoEncontradaException("Conta de destino não encontrada"));
+    public Transferencia realizarTransferencia(TransferenciaRequestDTO request, Usuario usuarioAutenticado) {
+        Conta contaOrigem = usuarioAutenticado.getConta();
+        if (contaOrigem == null) {
+            throw new ContaNaoEncontradaException("Usuário autenticado não possui uma conta vinculada.");
+        }
+
+        Conta contaDestino;
+
+        if (request.contaFinal() == null && request.cpf() == null) {
+            throw new IllegalArgumentException("Você precisa informar o ID da conta ou o CPF.");
+        } else if (request.contaFinal() != null && request.cpf() != null) {
+            throw new IllegalArgumentException("Envie apenas o ID da conta ou apenas o CPF, não os dois juntos.");
+        } else if (request.contaFinal() != null) {
+            contaDestino = contaRepository.findById(request.contaFinal()).orElseThrow(() -> new ContaNaoEncontradaException("Conta a receber não encontrada com o ID passado."));
+        } else {
+            contaDestino = contaRepository.findByUsuarioCpf(request.cpf()).orElseThrow(() -> new CpfInvalidoException("CPF inválido ou não encontrado."));
+        }
 
         validarTransferencia(contaOrigem, contaDestino, request.saldo());
         contaOrigem.debitar(request.saldo());

@@ -8,4 +8,6 @@ import java.util.Optional;
 @Repository
 public interface ContaRepository extends JpaRepository<Conta, Long> {
     Optional<Conta> findById(Long id);
+
+    Optional<Conta> findByUsuarioCpf(String cpf);
 }
