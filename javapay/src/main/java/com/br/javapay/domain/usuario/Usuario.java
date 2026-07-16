@@ -1,6 +1,7 @@
 package com.br.javapay.domain.usuario;
 
 import com.br.javapay.domain.conta.Conta;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -43,6 +44,7 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private Roles role;
 
+    @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
     private Conta conta;
 

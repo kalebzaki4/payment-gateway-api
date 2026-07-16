@@ -2,6 +2,7 @@ package com.br.javapay.domain.conta;
 
 import com.br.javapay.domain.tranferencia.Transferencia;
 import com.br.javapay.domain.usuario.Usuario;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class Conta implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonBackReference
     @OneToOne (mappedBy = "conta")
     private Usuario usuario;
 

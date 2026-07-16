@@ -4,7 +4,7 @@ import com.br.javapay.domain.conta.Conta;
 import com.br.javapay.domain.conta.ContaRepository;
 import com.br.javapay.domain.conta.Status;
 import com.br.javapay.domain.usuario.Usuario;
-import com.br.javapay.domain.usuario.UsuarioRepository; // IMPORTANTE
+import com.br.javapay.domain.usuario.UsuarioRepository;
 import com.br.javapay.infra.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,25 +29,34 @@ public class TranferenciaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public List<Transferencia> findAll(Usuario usuario) {
-        Usuario usuarioCompleto = usuarioRepository.findById(usuario.getId()).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
+    public List<TransferenciaResponseDTO> findAll(Usuario usuario) {
+        Usuario usuarioCompleto = usuarioRepository.findById(usuario.getId())
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
 
         Conta contaDoUsuario = usuarioCompleto.getConta();
-
         List<Transferencia> transferenciasDoUsuario = transferenciaRepository.findByConta(contaDoUsuario);
-        return transferenciasDoUsuario;
 
+        if (transferenciasDoUsuario.isEmpty()) {
+            throw new SemExtratoException("Nenhuma transferencia encontrada");
+        }
+
+        return transferenciasDoUsuario.stream()
+                .map(t -> new TransferenciaResponseDTO(
+                        t.getId(), t.getValor(), t.getDataTransferencia(),
+                        t.getStatus(), t.getContaInicial().getValor(), t.getContaFinal().getId()))
+                .toList();
     }
 
-    public List<Transferencia> findByDataOrId(Long id, LocalDateTime dataRequest, Usuario usuario) {
-        List<Transferencia> extrato = new ArrayList<>();
+    public List<TransferenciaResponseDTO> findByDataOrId(Long id, LocalDateTime dataRequest, Usuario usuario) {
         if (usuario == null) {
             throw new UsuarioNaoEncontradoException("Usuario não encontrado");
         }
 
-        Usuario usuarioCompleto = usuarioRepository.findById(usuario.getId()).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
+        Usuario usuarioCompleto = usuarioRepository.findById(usuario.getId())
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
 
         Conta contaDoUsuario = usuarioCompleto.getConta();
+        List<Transferencia> extrato = new ArrayList<>();
 
         if (id != null && dataRequest != null) {
             throw new IllegalArgumentException("o ID ou a data não podem ser preenchidos juntos, é apenas um ou outro");
@@ -59,20 +68,30 @@ public class TranferenciaService {
         if (id == null && dataRequest != null) {
             LocalDateTime dataInicio = dataRequest;
             LocalDateTime dataFim = dataRequest.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
-
             extrato = transferenciaRepository.findByContaAndDataBetween(contaDoUsuario, dataInicio, dataFim);
         }
 
         if (id != null && dataRequest == null) {
-            extrato = transferenciaRepository.findById(id).filter(t -> t.getContaInicial().equals(contaDoUsuario) || t.getContaFinal().equals(contaDoUsuario)).map(List::of).orElse(new ArrayList<>());
+            extrato = transferenciaRepository.findById(id)
+                    .filter(t -> t.getContaInicial().equals(contaDoUsuario) || t.getContaFinal().equals(contaDoUsuario))
+                    .map(List::of).orElse(new ArrayList<>());
         }
 
-        return extrato;
+        if (extrato.isEmpty()) {
+            throw new SemExtratoException("Nenhuma transferencia encontrada nesse dia");
+        }
+
+        return extrato.stream()
+                .map(t -> new TransferenciaResponseDTO(
+                        t.getId(), t.getValor(), t.getDataTransferencia(),
+                        t.getStatus(), t.getContaInicial().getValor(), t.getContaFinal().getId()))
+                .toList();
     }
 
     @Transactional
-    public Transferencia realizarTransferencia(TransferenciaRequestDTO request, Usuario usuarioAutenticado) {
-        Usuario usuarioCompleto = usuarioRepository.findById(usuarioAutenticado.getId()).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
+    public TransferenciaResponseDTO realizarTransferencia(TransferenciaRequestDTO request, Usuario usuarioAutenticado) {
+        Usuario usuarioCompleto = usuarioRepository.findById(usuarioAutenticado.getId())
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
 
         Conta contaOrigem = usuarioCompleto.getConta();
 
@@ -87,9 +106,11 @@ public class TranferenciaService {
         } else if (request.contaFinal() != null && request.cpf() != null) {
             throw new IllegalArgumentException("Envie apenas o ID da conta ou apenas o CPF, não os dois juntos.");
         } else if (request.contaFinal() != null) {
-            contaDestino = contaRepository.findById(request.contaFinal()).orElseThrow(() -> new ContaNaoEncontradaException("Conta a receber não encontrada com o ID passado."));
+            contaDestino = contaRepository.findById(request.contaFinal())
+                    .orElseThrow(() -> new ContaNaoEncontradaException("Conta a receber não encontrada com o ID passado."));
         } else {
-            contaDestino = contaRepository.findByUsuarioCpf(request.cpf()).orElseThrow(() -> new CpfInvalidoException("CPF inválido ou não encontrado."));
+            contaDestino = contaRepository.findByUsuarioCpf(request.cpf())
+                    .orElseThrow(() -> new CpfInvalidoException("CPF inválido ou não encontrado."));
         }
 
         validarTransferencia(contaOrigem, contaDestino, request.saldo());
@@ -106,10 +127,22 @@ public class TranferenciaService {
         transferencia.setStatus(StatusTransferencia.CONCLUIDA);
         transferencia.setDataTransferencia(LocalDateTime.now(ZoneId.systemDefault()));
 
-        return transferenciaRepository.save(transferencia);
+        Transferencia transferenciaSalva = transferenciaRepository.save(transferencia);
+
+        return new TransferenciaResponseDTO(
+                transferenciaSalva.getId(),
+                transferenciaSalva.getValor(),
+                transferenciaSalva.getDataTransferencia(),
+                transferenciaSalva.getStatus(),
+                contaOrigem.getValor(),
+                contaDestino.getId()
+        );
     }
 
     private void validarTransferencia(Conta origem, Conta destino, BigDecimal valor) {
+        if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new SaldoInsulficienteOuInválidoException("O valor da transferência deve ser maior que zero.");
+        }
         if (origem.getStatus() == Status.INATIVO) {
             throw new ContaOrigemInativaException("Conta de origem está inativa");
         }
@@ -117,7 +150,7 @@ public class TranferenciaService {
             throw new ContaDestinoInativaException("Conta de destino está inativa");
         }
         if (origem.getValor().compareTo(valor) < 0) {
-            throw new SaldoInsulficienteException("Saldo insuficiente na conta de origem");
+            throw new SaldoInsulficienteOuInválidoException("Saldo insuficiente na conta de origem");
         }
     }
 }
