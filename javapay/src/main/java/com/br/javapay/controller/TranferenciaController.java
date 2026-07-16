@@ -27,18 +27,19 @@ public class TranferenciaController {
 
     // ver todas as tranferencias da minha conta
     @GetMapping(value = "/extrato")
-    public ResponseEntity<List<Transferencia>> getAllTransferencias() {
-        List<Transferencia> transferencias = tranferenciaService.findAll();
+    public ResponseEntity<List<Transferencia>> getAllTransferencias(@AuthenticationPrincipal Usuario usuario) {
+        List<Transferencia> transferencias = tranferenciaService.findAll(usuario);
         return ResponseEntity.ok().body(transferencias);
     }
 
     // ver transferencias pelo id ou data que ela foi feita ou recebida
     @GetMapping(value = "/filtrarTranferencias")
     public ResponseEntity<List<Transferencia>> getTranferenciasPorDataOuId(
+            @AuthenticationPrincipal Usuario usuario,
             @RequestParam(required = false) Long id,
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate dataTransferencia
     ) {
-        List<Transferencia> listaEncontrada = tranferenciaService.findByDataOrId(id, dataTransferencia.atStartOfDay());
+        List<Transferencia> listaEncontrada = tranferenciaService.findByDataOrId(id, dataTransferencia.atStartOfDay(), usuario);
         return ResponseEntity.ok().body(listaEncontrada);
     }
 

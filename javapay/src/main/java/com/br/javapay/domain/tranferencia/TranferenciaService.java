@@ -4,13 +4,13 @@ import com.br.javapay.domain.conta.Conta;
 import com.br.javapay.domain.conta.ContaRepository;
 import com.br.javapay.domain.conta.Status;
 import com.br.javapay.domain.usuario.Usuario;
+import com.br.javapay.domain.usuario.UsuarioRepository; // IMPORTANTE
 import com.br.javapay.infra.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -20,19 +20,34 @@ import java.util.List;
 public class TranferenciaService {
     private final TransferenciaRepository transferenciaRepository;
     private final ContaRepository contaRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Autowired
-    public TranferenciaService(TransferenciaRepository transferenciaRepository, ContaRepository contaRepository) {
+    public TranferenciaService(TransferenciaRepository transferenciaRepository, ContaRepository contaRepository, UsuarioRepository usuarioRepository) {
         this.transferenciaRepository = transferenciaRepository;
         this.contaRepository = contaRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
-    public List<Transferencia> findAll() {
-        return transferenciaRepository.findAll();
+    public List<Transferencia> findAll(Usuario usuario) {
+        Usuario usuarioCompleto = usuarioRepository.findById(usuario.getId()).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
+
+        Conta contaDoUsuario = usuarioCompleto.getConta();
+
+        List<Transferencia> transferenciasDoUsuario = transferenciaRepository.findByConta(contaDoUsuario);
+        return transferenciasDoUsuario;
+
     }
 
-    public List<Transferencia> findByDataOrId(Long id, LocalDateTime dataRequest) {
+    public List<Transferencia> findByDataOrId(Long id, LocalDateTime dataRequest, Usuario usuario) {
         List<Transferencia> extrato = new ArrayList<>();
+        if (usuario == null) {
+            throw new UsuarioNaoEncontradoException("Usuario não encontrado");
+        }
+
+        Usuario usuarioCompleto = usuarioRepository.findById(usuario.getId()).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
+
+        Conta contaDoUsuario = usuarioCompleto.getConta();
 
         if (id != null && dataRequest != null) {
             throw new IllegalArgumentException("o ID ou a data não podem ser preenchidos juntos, é apenas um ou outro");
@@ -40,22 +55,29 @@ public class TranferenciaService {
         if (id == null && dataRequest == null) {
             throw new IllegalArgumentException("os dados não podem ser nulos");
         }
+
         if (id == null && dataRequest != null) {
             LocalDateTime dataInicio = dataRequest;
             LocalDateTime dataFim = dataRequest.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
-            extrato = transferenciaRepository.findByDataTransferenciaBetween(dataInicio, dataFim);
+
+            extrato = transferenciaRepository.findByContaAndDataBetween(contaDoUsuario, dataInicio, dataFim);
         }
+
         if (id != null && dataRequest == null) {
-            extrato = transferenciaRepository.findById(id).map(List::of).orElse(new ArrayList<>());
+            extrato = transferenciaRepository.findById(id).filter(t -> t.getContaInicial().equals(contaDoUsuario) || t.getContaFinal().equals(contaDoUsuario)).map(List::of).orElse(new ArrayList<>());
         }
+
         return extrato;
     }
 
     @Transactional
     public Transferencia realizarTransferencia(TransferenciaRequestDTO request, Usuario usuarioAutenticado) {
-        Conta contaOrigem = usuarioAutenticado.getConta();
+        Usuario usuarioCompleto = usuarioRepository.findById(usuarioAutenticado.getId()).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
+
+        Conta contaOrigem = usuarioCompleto.getConta();
+
         if (contaOrigem == null) {
-            throw new ContaNaoEncontradaException("Usuário autenticado não possui uma conta vinculada.");
+            throw new ContaNaoEncontradaException("Usuário não possui uma conta vinculada.");
         }
 
         Conta contaDestino;
