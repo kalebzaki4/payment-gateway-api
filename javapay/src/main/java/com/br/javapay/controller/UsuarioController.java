@@ -3,8 +3,11 @@ package com.br.javapay.controller;
 import com.br.javapay.domain.usuario.Usuario;
 import com.br.javapay.domain.usuario.UsuarioRequestDTO;
 import com.br.javapay.domain.usuario.UsuarioService;
+import com.br.javapay.domain.usuario.UsuarioUpdateDTO;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +32,12 @@ public class UsuarioController {
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
         Usuario usuario = usuarioService.findById(id);
         return ResponseEntity.ok(usuario);
+    }
+
+    @PutMapping(value = "/me")
+    public ResponseEntity<Void> updateUsuario(@AuthenticationPrincipal  Usuario usuario, @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
+        usuarioService.updateUsuario(usuario.getId(), usuarioUpdateDTO);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping(value = "/{id}")

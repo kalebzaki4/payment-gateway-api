@@ -57,6 +57,26 @@ public class UsuarioService {
         if (usuarioRequestDTO.senha() != null && !usuarioRequestDTO.senha().isBlank()) {
             usuario.setSenha(encoder.encode(usuarioRequestDTO.senha()));
         }
+        if (usuarioRequestDTO.cpf() != null && !usuarioRequestDTO.cpf().isBlank()) {
+            usuario.setCpf(usuarioRequestDTO.cpf());
+        }
+        if (usuarioRequestDTO.nome() != null && !usuarioRequestDTO.nome().isBlank()) {
+            usuario.setNome(usuarioRequestDTO.nome());
+        }
+        return usuarioRepository.save(usuario);
+    }
+
+    public Usuario updateUsuario(long id, UsuarioUpdateDTO usuarioUpdateDTO) {
+        Usuario usuario = findById(id);
+        if (usuarioUpdateDTO.email() != null && !usuarioUpdateDTO.email().isBlank()) {
+            usuario.setEmail(usuarioUpdateDTO.email());
+        }
+        if (usuarioUpdateDTO.senha() != null && !usuarioUpdateDTO.senha().isBlank()) {
+            usuario.setSenha(encoder.encode(usuarioUpdateDTO.senha()));
+        }
+        if (usuarioUpdateDTO.nome() != null && !usuarioUpdateDTO.nome().isBlank()) {
+            usuario.setNome(usuarioUpdateDTO.nome());
+        }
         return usuarioRepository.save(usuario);
     }
 
