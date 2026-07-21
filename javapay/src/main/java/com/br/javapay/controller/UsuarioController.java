@@ -34,8 +34,8 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario);
     }
 
-    @PutMapping(value = "/me")
-    public ResponseEntity<Void> updateUsuario(@AuthenticationPrincipal Usuario usuario, @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
+    @PutMapping(value = "/updateMe")
+    public ResponseEntity<Void> updateUsuario(@AuthenticationPrincipal  Usuario usuario, @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
         usuarioService.updateUsuario(usuario.getId(), usuarioUpdateDTO);
         return ResponseEntity.noContent().build();
     }

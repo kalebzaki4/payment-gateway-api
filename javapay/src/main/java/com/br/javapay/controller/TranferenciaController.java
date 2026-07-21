@@ -22,7 +22,7 @@ public class TranferenciaController {
         this.tranferenciaService = tranferenciaService;
     }
 
-    @GetMapping(value = "/extrato")
+    @GetMapping
     public ResponseEntity<List<TransferenciaResponseDTO>> getAllTransferencias(@AuthenticationPrincipal Usuario usuario) {
         return ResponseEntity.ok().body(tranferenciaService.findAll(usuario));
     }
