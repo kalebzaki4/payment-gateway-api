@@ -12,8 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Map;
@@ -27,7 +26,6 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Autowired
     public SecurityFilter(TokenService tokenService,
                           AutenticationService autenticationService,
-                          @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver,
                           ObjectMapper objectMapper) {
         this.tokenService = tokenService;
         this.autenticationService = autenticationService;
