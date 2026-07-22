@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.xml.transform.TransformerConfigurationException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -29,6 +30,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ContaNaoEncontradaException.class)
     public ResponseEntity<ErrorMessageDTO> handleContaNaoEncontradaException(ContaNaoEncontradaException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TransferenciaIlegalException.class)
+    public ResponseEntity<ErrorMessageDTO> handleTransferenciaIlegalException(TransferenciaIlegalException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UsuarioNaoEncontradoException.class)

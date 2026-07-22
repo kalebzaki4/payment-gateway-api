@@ -1,6 +1,7 @@
 package com.br.javapay.infra.security;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.br.javapay.infra.exception.ErrorMessageDTO;
 import com.br.javapay.infra.exception.TokenInvalidoException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,6 +16,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 
 @Component
@@ -45,7 +48,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             } catch (TokenExpiredException | TokenInvalidoException e) {
-                enviarErro(response, "Token expirado ou inválido. Por favor, faça login novamente.", HttpServletResponse.SC_FORBIDDEN);
+                enviarErro(response, "Token expirado ou inválido. Por favor, faça login novamente.", HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
         }
@@ -57,12 +60,13 @@ public class SecurityFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        var respostaErro = Map.of(
-                "message", mensagem,
-                "status", status
+        ErrorMessageDTO errorMessageDTO = new ErrorMessageDTO(
+                mensagem,
+                LocalDateTime.now(ZoneId.of("UTC")).toString(),
+                null
         );
 
-        response.getWriter().write(objectMapper.writeValueAsString(respostaErro));
+        response.getWriter().write(objectMapper.writeValueAsString(errorMessageDTO));
     }
 
     private String recuperarToken(HttpServletRequest request) {

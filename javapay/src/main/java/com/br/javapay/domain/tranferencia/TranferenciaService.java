@@ -140,6 +140,9 @@ public class TranferenciaService {
     }
 
     private void validarTransferencia(Conta origem, Conta destino, BigDecimal valor) {
+        if (origem.getId().equals(destino.getId())) {
+            throw new TransferenciaIlegalException("Você não pode realizar uma transferência para a sua própria conta.");
+        }
         if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new SaldoInsulficienteOuInválidoException("O valor da transferência deve ser maior que zero.");
         }

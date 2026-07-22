@@ -2,6 +2,7 @@ package com.br.javapay.controller;
 
 import com.br.javapay.domain.tranferencia.*;
 import com.br.javapay.domain.usuario.Usuario;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class TranferenciaController {
 
     @PostMapping(value = "/realizarTranferencia")
     public ResponseEntity<TransferenciaResponseDTO> createTransferencia(
-            @RequestBody TransferenciaRequestDTO transferenciaRequestDTO,
+            @Valid @RequestBody TransferenciaRequestDTO transferenciaRequestDTO,
             @AuthenticationPrincipal Usuario usuarioAutenticado) {
         return ResponseEntity.ok().body(tranferenciaService.realizarTransferencia(transferenciaRequestDTO, usuarioAutenticado));
     }
