@@ -52,18 +52,18 @@ public class TranferenciaService {
             throw new UsuarioNaoEncontradoException("Usuario não encontrado");
         }
 
-        Usuario usuarioCompleto = usuarioRepository.findById(usuario.getId())
-                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
-
-        Conta contaDoUsuario = usuarioCompleto.getConta();
-        List<Transferencia> extrato = new ArrayList<>();
-
         if (id != null && dataRequest != null) {
             throw new IllegalArgumentException("o ID ou a data não podem ser preenchidos juntos, é apenas um ou outro");
         }
         if (id == null && dataRequest == null) {
             throw new IllegalArgumentException("os dados não podem ser nulos");
         }
+
+        Usuario usuarioCompleto = usuarioRepository.findById(usuario.getId())
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado no banco"));
+
+        Conta contaDoUsuario = usuarioCompleto.getConta();
+        List<Transferencia> extrato = new ArrayList<>();
 
         if (id == null && dataRequest != null) {
             LocalDateTime dataInicio = dataRequest;
