@@ -10,6 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./javapay
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -20,6 +24,7 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: 'maven'
+        cache-dependency-path: 'javapay/pom.xml'
 
     - name: Grant execute permission for mvnw
       run: chmod +x mvnw
